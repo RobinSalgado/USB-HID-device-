@@ -74,7 +74,6 @@ static usb_status_t USB_DeviceHidKeyboardAction(void) {
 		PaintText,
 		B,
 		Exclamation,
-		Finish,
 		EnterForPaint,
 		H,
 		O,
@@ -84,16 +83,18 @@ static usb_status_t USB_DeviceHidKeyboardAction(void) {
 		U,
 		N,
 		D,
+		O2,
 		Windows,
 		Enter,
 		Copy,
-		Page,
+		paste,
 		Space,
 		Text,
 		Windows2,
 		B2,
 		Enter2,
-		ventanaIzq
+		ventanaIzq,
+		Finish
 
 	};
 
@@ -197,12 +198,13 @@ static usb_status_t USB_DeviceHidKeyboardAction(void) {
 			s_UsbDeviceHidKeyboard.buffer[2] = KEY_O;
 			if (select1 == 0) {
 				dir = L;
+				select1=1;
 			} else if (select1 == 1) {
 				select1 = 0;
 				dir = Exclamation;
 			}
 		}
-		select1=1;
+
 		break;
 
 	case L:
@@ -279,9 +281,16 @@ static usb_status_t USB_DeviceHidKeyboardAction(void) {
 		if (x > 30U) {
 			s_UsbDeviceHidKeyboard.buffer[2] = KEY_D;
 			select1 = 1;
-			dir = O;
+			dir = O2;
 		}
 		break;
+	case O2:
+			x++;
+			if (x > 30U) {
+				s_UsbDeviceHidKeyboard.buffer[2] = KEY_O;
+				dir = Text;
+			}
+			break;
 	case Exclamation:
 		x++;
 		if (x > 30U) {
@@ -313,21 +322,26 @@ static usb_status_t USB_DeviceHidKeyboardAction(void) {
 			dir = Windows2;
 		}
 		break;
-	case Page:
+
+	case paste:
 		x++;
-		if (x > 300U) {
+		if (x > 70U) {
 			s_UsbDeviceHidKeyboard.buffer[0] = MODIFERKEYS_LEFT_CTRL;
 			s_UsbDeviceHidKeyboard.buffer[2] = KEY_V;
-			dir = Finish;
-		}
-
-	case Finish:
-		x++;
-		if (x > 50) {
-			s_UsbDeviceHidKeyboard.buffer[2] = 0;
-			s_UsbDeviceHidKeyboard.buffer[3] = 0;
+			x=0;
+     dir = 50;
 		}
 		break;
+
+	case Finish:
+			x++;
+			if (x > 30U) {
+				s_UsbDeviceHidKeyboard.buffer[2] = KEY_RIGHT_GUI;
+				s_UsbDeviceHidKeyboard.buffer[3] = KEY_LEFTARROW;
+				x=0;
+	     dir = 50;
+			}
+			break;
 	case Windows2:
 		x++;
 		if (x > 30U) {
@@ -339,7 +353,7 @@ static usb_status_t USB_DeviceHidKeyboardAction(void) {
 		break;
 	case B2:
 		x++;
-		if (x > 30U) {
+		if (x > 50U) {
 			s_UsbDeviceHidKeyboard.buffer[0] = 0x00U;
 			s_UsbDeviceHidKeyboard.buffer[2] = KEY_B;
 			x = 0;
@@ -351,7 +365,8 @@ static usb_status_t USB_DeviceHidKeyboardAction(void) {
 		x++;
 		if (x > 30U) {
 			s_UsbDeviceHidKeyboard.buffer[2] = KEY_ENTER;
-			dir = Page;
+			x=0;
+			dir = paste;
 		}
 		break;
 	default:
